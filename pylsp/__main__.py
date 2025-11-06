@@ -26,7 +26,7 @@ LOG_FORMAT = "%(asctime)s {} - %(levelname)s - %(name)s - %(message)s".format(
 
 
 def add_arguments(parser) -> None:
-    parser.description = "Python Language Server"
+    parser.description = "Sage Language Server (customized from Python Language Server)"
 
     parser.add_argument(
         "--tcp", action="store_true", help="Use TCP server instead of stdio"

@@ -6,9 +6,9 @@ requires = ["setuptools>=69.0.0", "setuptools_scm[toml]>=3.4.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "python-lsp-server"
-authors = [{name = "Python Language Server Contributors"}]
-description = "Python Language Server for the Language Server Protocol"
+name = "sage-lsp-server"
+authors = [{name = "SeanDictionary"}]
+description = "SageMath Language Server for the Language Server Protocol"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
