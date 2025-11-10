@@ -30,7 +30,7 @@ LINT_DEBOUNCE_S = 0.5  # 500 ms
 PARENT_PROCESS_WATCH_INTERVAL = 10  # 10 s
 MAX_WORKERS = 64
 PYTHON_FILE_EXTENSIONS = (".py", ".pyi", ".sage")
-CONFIG_FILEs = ("pycodestyle.cfg", "setup.cfg", "tox.ini", ".flake8")
+CONFIG_FILEs = ("pycodestyle.cfg", "setup.cfg", "tox.ini", ".flake8", "pyproject.toml")
 
 
 class _StreamHandlerWrapper(socketserver.StreamRequestHandler):
@@ -94,6 +94,10 @@ def start_tcp_lang_server(bind_addr, port, check_parent_process, handler_class) 
 
 
 def start_io_lang_server(rfile, wfile, check_parent_process, handler_class) -> None:
+    try:
+        import sage.all
+    except Exception as e:
+        log.error(f"Current env does not include sage: \n\t{e}")
     if not issubclass(handler_class, PythonLSPServer):
         raise ValueError("Handler class must be an instance of PythonLSPServer")
     log.info("Starting %s IO language server", handler_class.__name__)
@@ -302,7 +306,7 @@ class PythonLSPServer(MethodDispatcher):
                 "openClose": True,
             },
             "notebookDocumentSync": {
-                "notebookSelector": [{"cells": [{"language": "python"}]}]
+                "notebookSelector": [{"cells": [{"language": "sagemath"}]}]
             },
             "workspace": {
                 "workspaceFolders": {"supported": True, "changeNotifications": True}

@@ -51,6 +51,9 @@ def pylsp_lint(workspace, document):
             lines = source.splitlines(keepends=True)
         else:
             lines = document.lines
+        
+        from sage.repl.preparse import preparse # type: ignore
+        lines = list(map(preparse, lines))
 
         c = pycodestyle.Checker(
             filename=document.path,

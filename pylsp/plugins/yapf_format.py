@@ -13,6 +13,11 @@ from pylsp._utils import get_eol_chars
 
 log = logging.getLogger(__name__)
 
+@hookimpl
+def pylsp_settings():
+    # Default yapf to disabled
+    return {"plugins": {"yapf": {"enabled": False}}}
+
 
 @hookimpl
 def pylsp_format_document(workspace, document, options):

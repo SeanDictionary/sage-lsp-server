@@ -25,7 +25,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://github.com/python-lsp/python-lsp-server"
+Homepage = "https://github.com/SeanDictionary/sage-lsp-server"
 
 [project.optional-dependencies]
 all = [

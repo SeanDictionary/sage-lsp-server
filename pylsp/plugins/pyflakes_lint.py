@@ -1,6 +1,7 @@
 # Copyright 2017-2020 Palantir Technologies, Inc.
 # Copyright 2021- Python Language Server Contributors.
 
+from re import S
 from pyflakes import api as pyflakes_api
 from pyflakes import messages
 
@@ -24,9 +25,15 @@ PYFLAKES_ERROR_MESSAGES = (
 @hookimpl
 def pylsp_lint(workspace, document):
     with workspace.report_progress("lint: pyflakes"):
+        from sage.repl.preparse import preparse # type: ignore
+
         reporter = PyflakesDiagnosticReport(document.lines)
+
+        sage_source = document.source
+        source = preparse(sage_source)
+
         pyflakes_api.check(
-            document.source.encode("utf-8"), document.path, reporter=reporter
+            source.encode("utf-8"), document.path, reporter=reporter
         )
         return reporter.diagnostics
 

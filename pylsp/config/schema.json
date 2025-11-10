@@ -494,7 +494,7 @@
     },
     "pylsp.plugins.yapf.enabled": {
       "type": "boolean",
-      "default": true,
+      "default": false,
       "description": "Enable or disable the plugin."
     },
     "pylsp.rope.extensionModules": {
