@@ -23,6 +23,11 @@ from ._version import __version__
 from .config import config
 from .workspace import Cell, Document, Notebook, Workspace
 
+# patch for sage syntax sugar support
+from .plugins import patches
+
+patches.patch()
+
 log = logging.getLogger(__name__)
 
 

@@ -10,11 +10,8 @@ from autopep8 import fix_code
 from pylsp import hookimpl
 from pylsp._utils import get_eol_chars
 
-import patches
 
 log = logging.getLogger(__name__)
-
-# patches.patch_e225()
 
 
 @hookimpl(tryfirst=True)  # Prefer autopep8 over YAPF
