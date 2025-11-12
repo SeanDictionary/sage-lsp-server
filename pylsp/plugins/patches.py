@@ -4,17 +4,20 @@ import pycodestyle
 
 
 def patch_pycodestyle(funcs):
-    for orig_func, new_func, err_code, arg in funcs:
+    """
+    Patch pycodestyle functions with new implementations.
+    """
+    for orig_func, new_func in funcs:
         err_codes, args = pycodestyle._checks['logical_line'][orig_func]
-        pycodestyle._checks['logical_line'][new_func] = (err_codes + err_code, args + arg)
+        pycodestyle._checks['logical_line'][new_func] = (err_codes, args)
         del pycodestyle._checks['logical_line'][orig_func]
 
-
-def patch_e225(logical_line=None, tokens=None):
+def extraneous_whitespace(logical_line=None):
     """
-    Change pycodestyle check for PEP8 E225 (missing whitespace around operator) to support Sage syntax sugar.
+    Patch for `pycodestyle.extraneous_whitespace` to support Sage syntax sugar.
     """
-    # E225: R.<x>, A.<x, y>, L.<t1, t2, t3>
+    # R.<x>, A.<x, y>, L.<t1, t2, t3>
+    # Fix: E201, E202
     sage_pattern = re.compile(r'\w+\.<\s*\w+\s*(,\s*\w+\s*)*\s*>')
     match = sage_pattern.search(logical_line)
     if match:
@@ -25,25 +28,56 @@ def patch_e225(logical_line=None, tokens=None):
         if logical_line[inner.end() - 2] == ' ':
             pos = inner.end() - 2
             yield pos, "E202 whitespace after '>'"
+
+    yield from pycodestyle.extraneous_whitespace(logical_line)
+
+def missing_whitespace(logical_line=None, tokens=None):
+    """
+    Patch for `pycodestyle.missing_whitespace` to support Sage syntax sugar.
+    """
+    # R.<x>, A.<x, y>, L.<t1, t2, t3>
+    # Fix: E225
+    # Add: E231
+    sage_pattern = re.compile(r'\w+\.<\s*\w+\s*(,\s*\w+\s*)*\s*>')
+    match = sage_pattern.search(logical_line)
+    if match:
         if "=" in logical_line:
             inner = re.search(r'.=.', logical_line)
-            if logical_line[inner.start()] != ' ' or logical_line[inner.end() - 1] != ' ':
-                yield inner.start() + 1, "E225 missing whitespace around operator"
+            if inner:
+                if inner and logical_line[inner.start()] != ' ':
+                    yield inner.start() + 1, "E225 missing whitespace around operator"
+                elif inner and logical_line[inner.start()] == ' ' and logical_line[inner.end() - 1] != ' ':
+                    yield inner.end() - 1, "E225 missing whitespace around operator"
         if "," in logical_line:
             for inner in re.finditer(r'\w,.', logical_line):
                 if logical_line[inner.end() - 1] != ' ':
                     yield inner.start() + 1, "E231 missing whitespace after ','"
         return
+    
+    # 1 ^^ 2
+    # Fix: E225
+    # Add: E227
+    if "^^" in logical_line:
+        inner = re.search(r'.\^\^.', logical_line)
+        if inner:
+            if logical_line[inner.start()] != ' ':
+                yield inner.start() + 1, "E227 missing whitespace around bitwise or shift operator"
+            if logical_line[inner.end() - 1] != ' ':
+                yield inner.end() - 1, "E227 missing whitespace around bitwise or shift operator"
+        return
+    
     # Otherwise, call the original function
     yield from pycodestyle.missing_whitespace(logical_line, tokens)
 
 FUNCS = [
     (
         pycodestyle.missing_whitespace,
-        patch_e225,
-        ["E201", "E202", "E225"],
-        [],
+        missing_whitespace,
     ),
+    (
+        pycodestyle.extraneous_whitespace,
+        extraneous_whitespace,
+    )
 ]
 
 def patch():
@@ -53,8 +87,9 @@ if __name__ == "__main__":
     patch()
     # test code
     lines = [
-        "R.< x,y ,z> = PolynomialRing(QQ)\n",
-        "a = [1]\n",
+        "R.<x, y, z> = PolynominalRing(QQ)\n",
+        "a = 123// 321\n",
+        "b = 123^^123\n"
     ]
     # test codestyle checker
     checker = pycodestyle.Checker(lines=lines)
