@@ -1,3 +1,5 @@
+From original repo [Python LSP Server](https://github.com/python-lsp/python-lsp-server)
+
 # Setup the environment
 
 1. Clone the repo: `git clone git@github.com:python-lsp/python-lsp-server.git`

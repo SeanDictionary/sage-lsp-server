@@ -88,12 +88,14 @@ if __name__ == "__main__":
     # test code
     lines = [
         "R.<x, y, z> = PolynominalRing(QQ)\n",
-        "a = 123// 321\n",
-        "b = 123^^123\n"
+        "a = 123 // 321\n",
+        "b = 123 ^^ 123\n"
     ]
+    
     # test codestyle checker
     checker = pycodestyle.Checker(lines=lines)
     print(checker.check_all())
+
     # test code formatter
     fixed = autopep8.fix_code("".join(lines))
     print(fixed)
